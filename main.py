@@ -1,48 +1,69 @@
-import tkinter as tk
+import tkinter
+from tkintermapview import TkinterMapView
 import geocoder
 
-def button_click(label_text):
-    # Use the geocoder library to get the user's location
-    g = geocoder.ip('me')
-    user_location = g.latlng
+def open_login_window():
+    def print_credentials():
+        username = username_entry.get()
+        password = password_entry.get()
+        print("Username:", username)
+        print("Password:", password)
+        login_window.destroy()
+        login_button.pack_forget()  # Remove the login button
 
-    label.config(text=f"You selected {label_text}!\nYour location: {user_location}")
-    ph_value = ph_entry.get()  # Get the pH value from the entry field
-    label.config(text=f"You selected {label_text}!\nYour location: {user_location}\nUser entered pH: {ph_value}")
-    
-    # Hide the buttons and entry after a selection
-    good_water_button.grid_forget()
-    okay_water_button.grid_forget()
-    bad_water_button.grid_forget()
-    ph_label.grid_forget()
-    ph_entry.grid_forget()
+    login_window = tkinter.Toplevel(root_tk)
+    login_window.title("Login Window")
+    login_window.geometry("300x200")
 
-# Create the main window
-window = tk.Tk()
-window.title("Water Quality")
+    # Add username label and entry
+    username_label = tkinter.Label(login_window, text="Username:")
+    username_label.pack()
+    username_entry = tkinter.Entry(login_window)
+    username_entry.pack()
 
-# Set a fixed window size
-window.geometry("400x250")  # Increased the height to accommodate the new entry field
+    # Add password label and entry
+    password_label = tkinter.Label(login_window, text="Password:")
+    password_label.pack()
+    password_entry = tkinter.Entry(login_window, show="*")
+    password_entry.pack()
 
-# Create a label to display the selected option
-label = tk.Label(window, text="", font=("Arial", 16))
-label.grid(row=0, column=0, columnspan=3, pady=20)
+    # Create a frame for buttons
+    button_frame = tkinter.Frame(login_window)
+    button_frame.pack()
 
-# Create the three buttons
-good_water_button = tk.Button(window, text="Good Water", command=lambda: button_click("Good Water"))
-okay_water_button = tk.Button(window, text="Okay Water", command=lambda: button_click("Okay Water"))
-bad_water_button = tk.Button(window, text="Bad Water", command=lambda: button_click("Bad Water"))
+    # Add a "Login" button at the bottom
+    login_button = tkinter.Button(button_frame, text="Login", command=print_credentials)
+    login_button.pack()
 
-# Create a label and entry field for pH
-ph_label = tk.Label(window, text="Enter pH (1-14):")
-ph_entry = tk.Entry(window)
+root_tk = tkinter.Tk()
+root_tk.geometry(f"{600}x420")
+root_tk.title("map_view_simple_example.py")
 
-# Place the buttons, label, and entry field in the grid
-good_water_button.grid(row=1, column=0, padx=10, pady=10)
-okay_water_button.grid(row=2, column=0, padx=10, pady=10)
-bad_water_button.grid(row=3, column=0, padx=10, pady=10)
-ph_label.grid(row=4, column=0, padx=10, pady=10)
-ph_entry.grid(row=4, column=1, padx=10, pady=10)
+# create map widget
+map_widget = TkinterMapView(root_tk, width=600, height=400, corner_radius=0)
+map_widget.pack(fill="both", expand=True)
 
-# Start the GUI event loop
-window.mainloop()
+# google normal tile server
+map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)
+
+# Get current location
+g = geocoder.ip('me')
+current_location = g.latlng
+
+# Set the map to the current location
+if current_location:
+    map_widget.set_address(f"{current_location[0]}, {current_location[1]}", marker=True)
+
+# Adding a pin on Orlando, Florida
+orlando_lat, orlando_lng = 28.5383, -81.3792  # Orlando, Florida coordinates
+map_widget.set_marker(orlando_lat, orlando_lng, "Orlando, Florida")
+
+# Create a blank space at the bottom
+blank_space = tkinter.Frame(root_tk, height=20, bg="white")
+blank_space.pack(fill="both", expand=True, side="bottom")
+
+# Add a "Login" button to the blank space
+login_button = tkinter.Button(blank_space, text="Login", command=open_login_window)
+login_button.pack()
+
+root_tk.mainloop()
