@@ -9,7 +9,15 @@ def open_login_window():
         print("Username:", username)
         print("Password:", password)
         login_window.destroy()
-        login_button.pack_forget()  # Remove the login button
+        login_button_map.pack_forget()  # Remove the login button
+        report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
+        report_button.pack(side="left")
+        logout_button = tkinter.Button(blank_space, text="Log Out", command=open_report_window)
+        logout_button.pack(side="left")
+        user_reports_button = tkinter.Button(blank_space, text="Your Reports", command=open_report_window)
+        user_reports_button.pack(side="left")
+        global_reports_button = tkinter.Button(blank_space, text="Global Reports", command=open_report_window)
+        global_reports_button.pack(side="left")
 
     login_window = tkinter.Toplevel(root_tk)
     login_window.title("Login Window")
@@ -35,9 +43,14 @@ def open_login_window():
     login_button = tkinter.Button(button_frame, text="Login", command=print_credentials)
     login_button.pack()
 
+def open_report_window():
+    report_window = tkinter.Toplevel(root_tk)
+    report_window.title("Water Report")
+    report_window.geometry("500x500")
+
 root_tk = tkinter.Tk()
 root_tk.geometry(f"{600}x420")
-root_tk.title("map_view_simple_example.py")
+root_tk.title("Water Quality Management")
 
 # create map widget
 map_widget = TkinterMapView(root_tk, width=600, height=400, corner_radius=0)
@@ -54,16 +67,12 @@ current_location = g.latlng
 if current_location:
     map_widget.set_address(f"{current_location[0]}, {current_location[1]}", marker=True)
 
-# Adding a pin on Orlando, Florida
-orlando_lat, orlando_lng = 28.5383, -81.3792  # Orlando, Florida coordinates
-map_widget.set_marker(orlando_lat, orlando_lng, "Orlando, Florida")
-
 # Create a blank space at the bottom
 blank_space = tkinter.Frame(root_tk, height=20, bg="white")
 blank_space.pack(fill="both", expand=True, side="bottom")
 
 # Add a "Login" button to the blank space
-login_button = tkinter.Button(blank_space, text="Login", command=open_login_window)
-login_button.pack()
+login_button_map = tkinter.Button(blank_space, text="Login", command=open_login_window)
+login_button_map.pack(side="left")
 
 root_tk.mainloop()
