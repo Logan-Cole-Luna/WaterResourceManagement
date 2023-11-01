@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the dataset
-final_dataset = pd.read_csv('water_potability_augmented.csv')
+final_dataset = pd.read_csv('water_potability_augmented_v2.csv')
 
 # 1. Temperature over time
 plt.figure(figsize=(14, 6))
@@ -40,6 +40,7 @@ plt.show()
 plt.figure(figsize=(14, 10))
 correlation_matrix = final_dataset.drop(columns=['Date']).corr()
 # seaborn import, used to make heat map
+# How does it predict how they affect one another?
 sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
 plt.title('Correlation Heatmap')
 plt.tight_layout()
