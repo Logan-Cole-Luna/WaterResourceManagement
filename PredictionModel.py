@@ -7,7 +7,19 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-
+import seaborn as sns
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import ExtraTreeClassifier
+from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.ensemble import RandomForestClassifier
 
 # Load the dataset
 dataset = pd.read_csv('water_potability_augmented_v2.csv')
@@ -64,43 +76,32 @@ rmse = np.sqrt(mean_squared_error(y_test, predict))
 
 print(f"Mean Absolute Error (MAE): {mae:.2f}")
 print(f"Root Mean Square Error (RMSE): {rmse:.2f}")
-'''''''''
 
 
+# The dataset for the classification task
+classification_data_path = 'water_potability_augmented_v2.csv'
+data = pd.read_csv(classification_data_path)
 
+# Prepare the data for classification
+data.dropna(inplace=True)  # Drop rows with missing values for simplicity
+X = data.drop(['Potability', 'Date'], axis=1)  # Exclude 'Date' for model training
+Y = data['Potability']
 
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import ExtraTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import BaggingClassifier
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.metrics import accuracy_score
+# Normalize and standardize the features
+normalizer = MinMaxScaler()
+standardizer = StandardScaler()
+X = normalizer.fit_transform(X)
+X = standardizer.fit_transform(X)
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler,StandardScaler
+# Split the data
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
-data=pd.read_csv("water_potability.csv")
-
-data.head()
-
-X=data.drop('Potability',axis=1)
-Y=data['Potability']
-
-normalizer=MinMaxScaler()
-standardizer=StandardScaler()
-X= normalizer.fit_transform(X)
-X=standardizer.fit_transform(X)
-
-X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.2,random_state=62)
+# Dictionary to hold model names and their scores
+model_scores = {}
 
 # create instances of all models
 models = {
-    'Logistic Regression': LogisticRegression(),
+    'Logistic Regression': LogisticRegression(max_iter=1000),
     'Naive Bayes': GaussianNB(),
     'Support Vector Machine': SVC(),
     'K-Nearest Neighbors': KNeighborsClassifier(),
@@ -112,9 +113,27 @@ models = {
     'Extra Trees': ExtraTreeClassifier(),
 }
 
-for name, md in models.items():
-    md.fit(X_train, Y_train)
-    ypred = md.predict(X_test)
+# Train and evaluate each model
+for name, model in models.items():
+    model.fit(X_train, Y_train)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(Y_test, y_pred)
+    model_scores[name] = accuracy
 
-    print(f"{name}  with accuracy : {accuracy_score(Y_test, ypred)}")
-'''''''''
+# Convert model_scores to a DataFrame for seaborn plotting
+model_scores_df = pd.DataFrame(list(model_scores.items()), columns=['Model', 'Accuracy'])
+
+# Plot the accuracies using seaborn
+plt.figure(figsize=(14, 8))
+accuracy_plot = sns.barplot(x='Accuracy', y='Model', data=model_scores_df.sort_values('Accuracy', ascending=False), palette="Blues_d")
+plt.title('Classification Model Accuracies')
+plt.xlabel('Accuracy')
+plt.ylabel('Model')
+plt.tight_layout()
+
+# Display the plot
+plt.show()
+
+# Return the scores for each model
+model_scores_df.sort_values('Accuracy', ascending=False)
+
