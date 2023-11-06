@@ -70,6 +70,41 @@ plt.ylabel('Algae Concentration')
 plt.legend()
 plt.show()
 
+
+
+from sklearn.svm import SVR
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+# Assuming X_train, X_test, y_train, and y_test have been defined correctly:
+# Scale the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train an SVR model
+svr_model = SVR()
+svr_model.fit(X_train_scaled, y_train)
+
+# Evaluate the model using the score method, which returns the coefficient of determination R^2 of the prediction.
+score = svr_model.score(X_test_scaled, y_test)
+print(f"R^2 Score: {score}")
+
+# Predict on the test dataset
+predict = svr_model.predict(X_test_scaled)
+
+# Plot Actual vs. Predicted
+plt.figure(figsize=(14, 6))
+plt.plot(test_dataset['Date'], y_test, label='Actual Values', color='blue')
+plt.plot(test_dataset['Date'], predict, label='Predicted Values', color='red', linestyle='dashed')
+plt.title('Actual vs. Predicted Algae Concentration')
+plt.xlabel('Date')
+plt.ylabel('Algae Concentration')
+plt.legend()
+plt.show()
+
+
+
 # Calculate and display the MAE and RMSE
 mae = mean_absolute_error(y_test, predict)
 rmse = np.sqrt(mean_squared_error(y_test, predict))
