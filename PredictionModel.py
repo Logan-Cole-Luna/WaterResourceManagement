@@ -1,6 +1,5 @@
 # https://www.kaggle.com/code/mrtoddy/kagglepredic
 # Time Series Forecasting
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -21,157 +20,159 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 
-# Load the dataset based off of user input
-# if input == 1
-# dataset = input
-# if input == 2
-dataset = pd.read_csv('water_potability_augmented_v2.csv')
 
-# Sort dataset by Date
-dataset = dataset.sort_values(by='Date')
+def train():
+    import matplotlib.pyplot as plt
+    # Load the dataset based off of user input
+    # if input == 1
+    # dataset = input
+    # if input == 2
+    dataset = pd.read_csv('water_potability_augmented_v2.csv')
 
-# Time Series Data Exploration
-# Plot Algae Concentration over time
-plt.figure(figsize=(12, 6))
-dataset.set_index('Date')['Algae Concentration'].plot()
-plt.title('Algae Concentration Over Time')
-plt.ylabel('Algae Concentration')
-plt.xlabel('Date')
-plt.show()
+    # Sort dataset by Date
+    dataset = dataset.sort_values(by='Date')
 
-# Split dataset chronologically
-train_size = int(len(dataset) * 0.6)
-train_dataset = dataset[:train_size]
-test_dataset = dataset[train_size:]
+    # Time Series Data Exploration
+    # Plot Algae Concentration over time
+    plt.figure(figsize=(12, 6))
+    dataset.set_index('Date')['Algae Concentration'].plot()
+    plt.title('Algae Concentration Over Time')
+    plt.ylabel('Algae Concentration')
+    plt.xlabel('Date')
+    plt.show()
 
-# Drop non-numeric columns and irrelevant columns for this modeling process
-X_train = train_dataset.drop(['Algae Concentration', 'Date'], axis=1)
-y_train = train_dataset['Algae Concentration']
+    # Split dataset chronologically
+    train_size = int(len(dataset) * 0.6)
+    train_dataset = dataset[:train_size]
+    test_dataset = dataset[train_size:]
 
-X_test = test_dataset.drop(['Algae Concentration', 'Date'], axis=1)
-y_test = test_dataset['Algae Concentration']
-print(y_test)
+    # Drop non-numeric columns and irrelevant columns for this modeling process
+    X_train = train_dataset.drop(['Algae Concentration', 'Date'], axis=1)
+    y_train = train_dataset['Algae Concentration']
 
-# Train a Linear Regression model
-regression = LinearRegression()
-regression.fit(X_train, y_train)
+    X_test = test_dataset.drop(['Algae Concentration', 'Date'], axis=1)
+    y_test = test_dataset['Algae Concentration']
+    print(y_test)
 
-# Evaluate the model
-score = regression.score(X_test, y_test)
-print(f"R^2 Score: {score}")
+    # Train a Linear Regression model
+    regression = LinearRegression()
+    regression.fit(X_train, y_train)
 
-# Predict on the test dataset (if you want to submit or save predictions)
-predict = regression.predict(X_test)
+    # Evaluate the model
+    score = regression.score(X_test, y_test)
+    print(f"R^2 Score: {score}")
 
-# Plot Actual vs. Predicted
-plt.figure(figsize=(14, 6))
-plt.plot(test_dataset['Date'], y_test, label='Actual Values', color='blue')
-plt.plot(test_dataset['Date'], predict, label='Predicted Values', color='red', linestyle='dashed')
-plt.title('Actual vs. Predicted Algae Concentration')
-plt.xlabel('Date')
-plt.ylabel('Algae Concentration')
-plt.legend()
-plt.show()
+    # Predict on the test dataset (if you want to submit or save predictions)
+    predict = regression.predict(X_test)
 
+    # Plot Actual vs. Predicted
+    plt.figure(figsize=(14, 6))
+    plt.plot(test_dataset['Date'], y_test, label='Actual Values', color='blue')
+    plt.plot(test_dataset['Date'], predict, label='Predicted Values', color='red', linestyle='dashed')
+    plt.title('Actual vs. Predicted Algae Concentration')
+    plt.xlabel('Date')
+    plt.ylabel('Algae Concentration')
+    plt.legend()
+    plt.show()
 
+    from sklearn.svm import SVR
+    from sklearn.preprocessing import StandardScaler
+    import matplotlib.pyplot as plt
 
-from sklearn.svm import SVR
-from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
+    # Assuming X_train, X_test, y_train, and y_test have been defined correctly:
+    # Scale the features
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
 
-# Assuming X_train, X_test, y_train, and y_test have been defined correctly:
-# Scale the features
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+    # Train an SVR model
+    svr_model = SVR()
+    svr_model.fit(X_train_scaled, y_train)
 
-# Train an SVR model
-svr_model = SVR()
-svr_model.fit(X_train_scaled, y_train)
+    # Evaluate the model using the score method, which returns the coefficient of determination R^2 of the prediction.
+    score = svr_model.score(X_test_scaled, y_test)
+    print(f"R^2 Score: {score}")
 
-# Evaluate the model using the score method, which returns the coefficient of determination R^2 of the prediction.
-score = svr_model.score(X_test_scaled, y_test)
-print(f"R^2 Score: {score}")
+    # Predict on the test dataset
+    predict = svr_model.predict(X_test_scaled)
 
-# Predict on the test dataset
-predict = svr_model.predict(X_test_scaled)
-
-# Plot Actual vs. Predicted
-plt.figure(figsize=(14, 6))
-plt.plot(test_dataset['Date'], y_test, label='Actual Values', color='blue')
-plt.plot(test_dataset['Date'], predict, label='Predicted Values', color='red', linestyle='dashed')
-plt.title('Actual vs. Predicted Algae Concentration')
-plt.xlabel('Date')
-plt.ylabel('Algae Concentration')
-plt.legend()
-plt.show()
-
-
-
-# Calculate and display the MAE and RMSE
-mae = mean_absolute_error(y_test, predict)
-rmse = np.sqrt(mean_squared_error(y_test, predict))
-
-print(f"Mean Absolute Error (MAE): {mae:.2f}")
-print(f"Root Mean Square Error (RMSE): {rmse:.2f}")
+    # Plot Actual vs. Predicted
+    plt.figure(figsize=(14, 6))
+    plt.plot(test_dataset['Date'], y_test, label='Actual Values', color='blue')
+    plt.plot(test_dataset['Date'], predict, label='Predicted Values', color='red', linestyle='dashed')
+    plt.title('Actual vs. Predicted Algae Concentration')
+    plt.xlabel('Date')
+    plt.ylabel('Algae Concentration')
+    plt.legend()
+    plt.show()
 
 
-# The dataset for the classification task
-classification_data_path = 'water_potability_augmented_v2.csv'
-data = pd.read_csv(classification_data_path)
 
-# Prepare the data for classification
-data.dropna(inplace=True)  # Drop rows with missing values for simplicity
-X = data.drop(['Potability', 'Date'], axis=1)  # Exclude 'Date' for model training
-Y = data['Potability']
+    # Calculate and display the MAE and RMSE
+    mae = mean_absolute_error(y_test, predict)
+    rmse = np.sqrt(mean_squared_error(y_test, predict))
 
-# Normalize and standardize the features
-normalizer = MinMaxScaler()
-standardizer = StandardScaler()
-X = normalizer.fit_transform(X)
-X = standardizer.fit_transform(X)
+    print(f"Mean Absolute Error (MAE): {mae:.2f}")
+    print(f"Root Mean Square Error (RMSE): {rmse:.2f}")
 
-# Split the data
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
-# Dictionary to hold model names and their scores
-model_scores = {}
+    # The dataset for the classification task
+    classification_data_path = 'water_potability_augmented_v2.csv'
+    data = pd.read_csv(classification_data_path)
 
-# create instances of all models
-models = {
-    'Logistic Regression': LogisticRegression(max_iter=1000),
-    'Naive Bayes': GaussianNB(),
-    'Support Vector Machine': SVC(),
-    'K-Nearest Neighbors': KNeighborsClassifier(),
-    'Decision Tree': DecisionTreeClassifier(),
-    'Random Forest': RandomForestClassifier(),
-    'Bagging': BaggingClassifier(),
-    'AdaBoost': AdaBoostClassifier(),
-    'Gradient Boosting': GradientBoostingClassifier(),
-    'Extra Trees': ExtraTreeClassifier(),
-}
+    # Prepare the data for classification
+    data.dropna(inplace=True)  # Drop rows with missing values for simplicity
+    X = data.drop(['Potability', 'Date'], axis=1)  # Exclude 'Date' for model training
+    Y = data['Potability']
 
-# Train and evaluate each model
-for name, model in models.items():
-    model.fit(X_train, Y_train)
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(Y_test, y_pred)
-    model_scores[name] = accuracy
+    # Normalize and standardize the features
+    normalizer = MinMaxScaler()
+    standardizer = StandardScaler()
+    X = normalizer.fit_transform(X)
+    X = standardizer.fit_transform(X)
 
-# Convert model_scores to a DataFrame for seaborn plotting
-model_scores_df = pd.DataFrame(list(model_scores.items()), columns=['Model', 'Accuracy'])
+    # Split the data
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
-# Plot the accuracies using seaborn
-plt.figure(figsize=(14, 8))
-accuracy_plot = sns.barplot(x='Accuracy', y='Model', data=model_scores_df.sort_values('Accuracy', ascending=False), palette="Blues_d")
-plt.title('Classification Model Accuracies')
-plt.xlabel('Accuracy')
-plt.ylabel('Model')
-plt.tight_layout()
+    # Dictionary to hold model names and their scores
+    model_scores = {}
 
-# Display the plot
-plt.show()
+    # create instances of all models
+    models = {
+        'Logistic Regression': LogisticRegression(max_iter=1000),
+        'Naive Bayes': GaussianNB(),
+        'Support Vector Machine': SVC(),
+        'K-Nearest Neighbors': KNeighborsClassifier(),
+        'Decision Tree': DecisionTreeClassifier(),
+        'Random Forest': RandomForestClassifier(),
+        'Bagging': BaggingClassifier(),
+        'AdaBoost': AdaBoostClassifier(),
+        'Gradient Boosting': GradientBoostingClassifier(),
+        'Extra Trees': ExtraTreeClassifier(),
+    }
 
-# Return the scores for each model
-model_scores_df.sort_values('Accuracy', ascending=False)
+    # Train and evaluate each model
+    for name, model in models.items():
+        model.fit(X_train, Y_train)
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(Y_test, y_pred)
+        model_scores[name] = accuracy
 
+    # Convert model_scores to a DataFrame for seaborn plotting
+    model_scores_df = pd.DataFrame(list(model_scores.items()), columns=['Model', 'Accuracy'])
+
+    # Plot the accuracies using seaborn
+    plt.figure(figsize=(14, 8))
+    accuracy_plot = sns.barplot(x='Accuracy', y='Model', data=model_scores_df.sort_values('Accuracy', ascending=False), palette="Blues_d")
+    plt.title('Classification Model Accuracies')
+    plt.xlabel('Accuracy')
+    plt.ylabel('Model')
+    plt.tight_layout()
+
+    # Display the plot
+    plt.show()
+
+    # Return the scores for each model
+    model_scores_df.sort_values('Accuracy', ascending=False)
+
+train()
