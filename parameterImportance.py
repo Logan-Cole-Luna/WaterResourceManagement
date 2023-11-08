@@ -19,7 +19,7 @@ x = data_clean[['ph','Hardness','Solids','Chloramines','Sulfate','Conductivity',
 y = data_clean['Potability']
 
 
-#make model
+# make model
 model = RandomForestClassifier()
 model.fit(x,y)
 

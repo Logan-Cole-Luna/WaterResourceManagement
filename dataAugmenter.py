@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 # ---- Load the Kaggle Dataset ----
+
 # The dataset is loaded from a specified path and stored in a DataFrame.
 kaggle_dataset = pd.read_csv('water_potability_augmented.csv')
 
@@ -25,19 +26,23 @@ kaggle_dataset['Algae Increase'] = (kaggle_dataset['Solids'].diff(periods=-1) < 
 
 # Simulate Microbial Counts using a Poisson distribution.
 # https://www.scribbr.com/statistics/poisson-distribution/#:~:text=A%20Poisson%20distribution%20is%20a,the%20mean%20number%20of%20events.
-# Reasoning: The Poisson distribution is often used to model the number of times an event occurs within a fixed period. It's commonly used for counting data, like the number of bacteria or microbes in a certain volume of water.
+# Reasoning: The Poisson distribution is often used to model the number of
+#   times an event occurs within a fixed period. It's commonly used for counting data,
+#   like the number of bacteria or microbes in a certain volume of water.
 # Reference: Consul, P. C., & Jain, G. C. (1973). A generalization of the Poisson distribution. Technometrics, 15(4), 791-799.kaggle_microbial_counts = np.random.poisson(30, len(kaggle_dataset))
 kaggle_microbial_counts = np.random.poisson(30, len(kaggle_dataset))
 kaggle_dataset['Microbial Counts'] = [max(0, m) for m in kaggle_microbial_counts]
 
 # Simulate BOD (Biochemical Oxygen Demand) using a normal distribution.
-# Reasoning: Many natural phenomena, due to the Central Limit Theorem, tend to have outcomes that are normally distributed, especially when they are the result of many random processes.
+# Reasoning: Many natural phenomena, due to the Central Limit Theorem,
+#   tend to have outcomes that are normally distributed, especially when they are the result of many random processes.
 # Reference: DeCarlo, L. T. (1997). On the meaning and use of kurtosis. Psychological methods, 2(3), 292.
 kaggle_BOD = np.random.normal(7.5, 5, len(kaggle_dataset))
 kaggle_dataset['BOD'] = [max(0, b) for b in kaggle_BOD]
 
 # Simulate a combined index for Heavy Metals using a uniform distribution.
-# Reasoning: The uniform distribution provides a constant probability for all outcomes in a specified range. It's used when there's no particular preference or weighting for values within a given range.
+# Reasoning: The uniform distribution provides a constant probability for all outcomes in a specified range.
+#   It's used when there's no particular preference or weighting for values within a given range.
 # Reference: Johnson, N. L., Kotz, S., & Balakrishnan, N. (1994). Continuous univariate distributions, Vol. 1. (Wiley Series in Probability and Mathematical Statistics).
 kaggle_dataset['Heavy Metals Index'] = np.random.uniform(0, 1, len(kaggle_dataset))
 
@@ -103,4 +108,4 @@ final_dataset = final_dataset.fillna(final_dataset.median(numeric_only=True))
 
 # Display the first few rows of the merged dataset.
 print("Augmented Dataset:\n", final_dataset.head())
-final_dataset.to_csv('water_potability_augmented.csv', index=False)
+final_dataset.to_csv('water_potability_augmented_train.csv', index=False)
