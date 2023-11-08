@@ -21,7 +21,10 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 
-# Load the dataset
+# Load the dataset based off of user input
+# if input == 1
+# dataset = input
+# if input == 2
 dataset = pd.read_csv('water_potability_augmented_v2.csv')
 
 # Sort dataset by Date

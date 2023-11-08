@@ -75,4 +75,24 @@ blank_space.pack(fill="both", expand=True, side="bottom")
 login_button_map = tkinter.Button(blank_space, text="Login", command=open_login_window)
 login_button_map.pack(side="left")
 
+# Sample code to display an image, will take images from PredictionModel & display
+'''
+from PIL import ImageTk, Image
+image1 = Image.open("<path/image_name>")
+import tkinter
+from tkinter import *
+from PIL import Image, ImageTk
+root = Tk()
+
+# Create a photo image object of the image in the path
+image1 = Image.open("<path/image_name>")
+test = ImageTk.PhotoImage(image1)
+label1 = tkinter.Label(image=test)
+label1.image = test
+
+# Position image
+label1.place(x=<x_coordinate>, y=<y_coordinate>)
+root.mainloop()
+'''
+
 root_tk.mainloop()
