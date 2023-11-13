@@ -25,7 +25,7 @@ model.fit(x,y)
 
 #get importance
 importance = model.feature_importances_
-print(importance)
+#print(importance)
 #prints importance
 features = ['ph','Hardness','Solids','Chloramines','Sulfate','Conductivity','Organic_carbon','Trihalomethanes','Turbidity']
 for i,v in enumerate(importance):
