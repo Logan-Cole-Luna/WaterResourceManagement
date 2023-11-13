@@ -70,8 +70,9 @@ def train():
     # Return the path of the saved images
     return 'predicted_algae_concentration.png'
 
+
 def open_login_window():
-    # Function to open a new window with the prediction image
+  # Function to open a new window with the prediction image
     def open_prediction_window():
         data_window = Toplevel(root_tk)
         data_window.title("Data Input Window")
@@ -96,20 +97,39 @@ def open_login_window():
         print("Password:", password)
         login_window.destroy()
         login_button_map.pack_forget()  # Remove the login button
-        report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
-        report_button.pack(side="left")
-        logout_button = tkinter.Button(blank_space, text="Log Out", command=open_report_window)
-        logout_button.pack(side="left")
-        user_reports_button = tkinter.Button(blank_space, text="Your Reports", command=open_report_window)
-        user_reports_button.pack(side="left")
-        global_reports_button = tkinter.Button(blank_space, text="Global Reports", command=open_report_window)
+        data_button_pack.pack(side="left")
+        prediction_button.pack(side="left")
         global_reports_button.pack(side="left")
-        prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
-        prediction_button.pack()
-        data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
-        data_button_pack.pack(side="right")
+        user_reports_button.pack(side="left")
+        logout_button.pack(side="right")
+        report_button.pack(side="left")
 
-        # Function to open a new window with the prediction images
+
+    # Function to open a new window with the prediction images
+    def log_out():
+        # Hide the buttons related to the logged-in state
+        report_button.pack_forget()
+        logout_button.pack_forget()
+        user_reports_button.pack_forget()
+        global_reports_button.pack_forget()
+        prediction_button.pack_forget()
+        data_button_pack.pack_forget()
+
+        # Display the login button
+        login_button_map.pack()
+
+
+
+    report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
+    
+    logout_button = tkinter.Button(blank_space, text="Log Out", command=log_out)
+    
+    user_reports_button = tkinter.Button(blank_space_top, text="Your Reports", command=your_reports)
+    
+    global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=open_report_window)
+    
+    prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
+    data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
 
     login_window = tkinter.Toplevel(root_tk)
     login_window.title("Login Window")
@@ -179,7 +199,7 @@ root_tk.geometry(f"{600}x420")
 root_tk.title("Water Quality Management")
 
 # create map widget
-map_widget = TkinterMapView(root_tk, width=600, height=400, corner_radius=0)
+map_widget = TkinterMapView(root_tk, width=600, height=370, corner_radius=0)
 map_widget.pack(fill="both", expand=True)
 
 # google normal tile server
@@ -190,16 +210,21 @@ g = geocoder.ip('me')
 current_location = g.latlng
 
 # Set the map to the current location
-if current_location:
-    map_widget.set_address(f"{current_location[0]}, {current_location[1]}", marker=True)
+def your_reports():
+    if current_location:
+        map_widget.set_address(f"{current_location[0]}, {current_location[1]}", marker=True)
 
 # Create a blank space at the bottom
 blank_space = tkinter.Frame(root_tk, height=20, bg="white")
 blank_space.pack(fill="both", expand=True, side="bottom")
 
+# Create a blank space at the top
+blank_space_top = tkinter.Frame(root_tk, height=20, bg="white")
+blank_space_top.pack(fill="both", expand=True, side="top")
+
 # Add a "Login" button to the blank space
 login_button_map = tkinter.Button(blank_space, text="Login", command=open_login_window)
-login_button_map.pack(side="left")
+login_button_map.pack()
 
 
 
