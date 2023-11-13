@@ -4,91 +4,36 @@ import geocoder
 from tkinter import Toplevel, Label, Button
 from PIL import Image, ImageTk
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+from PredictionModel import train
 
 
 # Assume that the train function returns a list of image file paths
-def train():
-    import matplotlib.pyplot as plt
-    # Load the dataset based off of user input
-    # if input == 1
-    # dataset = input
-    # if input == 2
-    dataset = pd.read_csv('water_potability_augmented_v2.csv')
+def open_prediction_window(User_Input):
+    data_window = Toplevel(root_tk)
+    data_window.title("Data Input Window")
+    data_window.geometry("300x200")
+    prediction_window = Toplevel(data_window)
+    prediction_window.title("Prediction Results")
 
-    # Sort dataset by Date
-    dataset = dataset.sort_values(by='Date')
+    if User_Input == 1:
+        dataset = 1
+    elif User_Input == 2:
+        dataset = pd.read_csv('water_potability_augmented_v2.csv')
 
-    # Time Series Data Exploration
-    # Plot Algae Concentration over time
-    plt.figure(figsize=(12, 6))
-    dataset.set_index('Date')['Algae Concentration'].plot()
-    plt.title('Algae Concentration Over Time')
-    plt.ylabel('Algae Concentration')
-    plt.xlabel('Date')
-    #plt.show()
+    # Load and display the prediction image
+    image_path = train(dataset)
+    img = Image.open(image_path)
+    img = img.resize((400, 250), Image.ANTIALIAS)
+    img = ImageTk.PhotoImage(img)
+    panel = Label(prediction_window, image=img)
+    panel.image = img
+    panel.pack()
 
-    # Split dataset chronologically
-    train_size = int(len(dataset) * 0.6)
-    train_dataset = dataset[:train_size]
-    test_dataset = dataset[train_size:]
+    # Button to open the prediction window
 
-    # Drop non-numeric columns and irrelevant columns for this modeling process
-    X_train = train_dataset.drop(['Algae Concentration', 'Date'], axis=1)
-    y_train = train_dataset['Algae Concentration']
-
-    X_test = test_dataset.drop(['Algae Concentration', 'Date'], axis=1)
-    y_test = test_dataset['Algae Concentration']
-    print(y_test)
-
-    # Train a Linear Regression model
-    regression = LinearRegression()
-    regression.fit(X_train, y_train)
-
-    # Evaluate the model
-    score = regression.score(X_test, y_test)
-    print(f"R^2 Score: {score}")
-
-    # Predict on the test dataset (if you want to submit or save predictions)
-    predict = regression.predict(X_test)
-
-    UserDataset = pd.read_csv('water_potability_augmented_example.csv')
-    UserData = UserDataset.drop(['Algae Concentration', 'Date'], axis=1)
-    predict = regression.predict(UserData)
-
-    # Plot Actual vs. Predicted
-    plt.figure(figsize=(14, 6))
-    plt.plot(UserDataset['Date'], predict, label='Predicted Values', color='red', linestyle='dashed')
-    plt.title('Predicted Algae Concentration')
-    plt.xlabel('Date')
-    plt.ylabel('Algae Concentration')
-    plt.show()
-    # Save the Predicted Algae Concentration plot
-    plt.savefig('predicted_algae_concentration.png')
-    plt.close()
-
-    # Return the path of the saved images
-    return 'predicted_algae_concentration.png'
 
 def open_login_window():
     # Function to open a new window with the prediction image
-    def open_prediction_window():
-        data_window = Toplevel(root_tk)
-        data_window.title("Data Input Window")
-        data_window.geometry("300x200")
-        prediction_window = Toplevel(data_window)
-        prediction_window.title("Prediction Results")
-
-        # Load and display the prediction image
-        image_path = train()
-        img = Image.open(image_path)
-        img = img.resize((400, 250), Image.ANTIALIAS)
-        img = ImageTk.PhotoImage(img)
-        panel = Label(prediction_window, image=img)
-        panel.image = img
-        panel.pack()
-
-        # Button to open the prediction window
     def print_credentials():
         username = username_entry.get()
         password = password_entry.get()
@@ -104,8 +49,6 @@ def open_login_window():
         user_reports_button.pack(side="left")
         global_reports_button = tkinter.Button(blank_space, text="Global Reports", command=open_report_window)
         global_reports_button.pack(side="left")
-        prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
-        prediction_button.pack()
         data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
         data_button_pack.pack(side="right")
 
@@ -160,10 +103,10 @@ def open_data_window():
     button_frame.pack()
 
     # Add a "Login" button at the bottom
-    yes_button = tkinter.Button(button_frame, text="Yes")
+    yes_button = tkinter.Button(button_frame, text="Yes", command=open_prediction_window(1))
     yes_button.pack()
 
-    no_button = tkinter.Button(button_frame, text="No")
+    no_button = tkinter.Button(button_frame, text="No", command=open_prediction_window(2))
     no_button.pack()
 
     info_label = tkinter.Label(data_window, text="If no, an example dataset will be used,\n if yes, \na dataset my be formatted similar \nto the dataset linked below:")

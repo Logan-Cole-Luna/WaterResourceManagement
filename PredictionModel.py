@@ -3,14 +3,12 @@
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
-def train():
+def train(dataset):
     import matplotlib.pyplot as plt
     # Load the dataset based off of user input
     # if input == 1
     # dataset = input
     # if input == 2
-    dataset = pd.read_csv('water_potability_augmented_v2.csv')
-
     # Sort dataset by Date
     dataset = dataset.sort_values(by='Date')
 
@@ -47,17 +45,6 @@ def train():
     # Predict on the test dataset (if you want to submit or save predictions)
     predict = regression.predict(X_test)
 
-    # Plot Actual vs. Predicted
-    plt.figure(figsize=(14, 6))
-    plt.plot(test_dataset['Date'], y_test, label='Actual Values', color='blue')
-    plt.plot(test_dataset['Date'], predict, label='Predicted Values', color='red', linestyle='dashed')
-    plt.title('Actual vs. Predicted Algae Concentration')
-    plt.xlabel('Date')
-    plt.ylabel('Algae Concentration')
-    plt.legend()
-    #plt.show()
-
-
     UserDataset = pd.read_csv('water_potability_augmented_example.csv')
     UserData = UserDataset.drop(['Algae Concentration', 'Date'], axis=1)
     predict = regression.predict(UserData)
@@ -68,15 +55,11 @@ def train():
     plt.title('Predicted Algae Concentration')
     plt.xlabel('Date')
     plt.ylabel('Algae Concentration')
+    #plt.show()
     # Save the Predicted Algae Concentration plot
     plt.savefig('predicted_algae_concentration.png')
     plt.close()
 
     # Return the path of the saved images
-    return ['predicted_algae_concentration.png']
+    return 'predicted_algae_concentration.png'
 
-
-# Capture the output images from the training function
-output_images = train()
-
-train()
