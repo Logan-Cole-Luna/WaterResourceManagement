@@ -40,4 +40,4 @@ kaggle_dataset['Algae Concentration'] = algae_concentration
 
 
 # Save the augmented dataset
-kaggle_dataset.to_csv('water_potability_augmented_v2.csv', index=False)
+kaggle_dataset.to_csv('water_potability_augmented_example.csv', index=False)
