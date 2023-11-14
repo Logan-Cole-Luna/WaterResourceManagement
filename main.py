@@ -1,3 +1,4 @@
+from statistics import LinearRegression
 import tkinter
 from tkintermapview import TkinterMapView
 import geocoder
@@ -70,14 +71,14 @@ def train():
     # Return the path of the saved images
     return 'predicted_algae_concentration.png'
 
-def open_login_window():
+def open_prediction_window(User_Input):
     # Function to open a new window with the prediction image
-    def open_prediction_window():
-        data_window = Toplevel(root_tk)
-        data_window.title("Data Input Window")
-        data_window.geometry("300x200")
-        prediction_window = Toplevel(data_window)
-        prediction_window.title("Prediction Results")
+
+    data_window = Toplevel(root_tk)
+    data_window.title("Data Input Window")
+    data_window.geometry("300x200")
+    prediction_window.title("Prediction Results")
+    prediction_window = Toplevel(data_window)
 
     if User_Input == 1:
         dataset = 1
@@ -105,13 +106,14 @@ def open_login_window():
         print("Password:", password)
         login_window.destroy()
         login_button_map.pack_forget()  # Remove the login button
+        logout_button.pack(side="right")
+        report_button.pack(side="left")
         data_button_pack.pack(side="left")
         prediction_button.pack(side="left")
+        user_reports_button.pack(side="left")
         global_reports_button.pack(side="left")
-        prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
-        prediction_button.pack()
-        data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
-        data_button_pack.pack(side="right")
+        data_button_pack.pack(side="left")
+
 
     # Function to open a new window with the prediction images
     def log_out():
@@ -129,15 +131,13 @@ def open_login_window():
 
 
     report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
-    
+    data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
+    prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
     logout_button = tkinter.Button(blank_space, text="Log Out", command=log_out)
     
     user_reports_button = tkinter.Button(blank_space_top, text="Your Reports", command=your_reports)
     
     global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=open_report_window)
-    
-    prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
-    data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
 
     login_window = tkinter.Toplevel(root_tk)
     login_window.title("Login Window")
@@ -177,21 +177,15 @@ def open_data_window():
     answer_label = tkinter.Label(data_window, text="Would you like to give a Dataset\n for Predictive Analysis (Yes/No):")
     answer_label.pack()
 
-    # Add password label and entry
-    # data_label = tkinter.Label(data_window, text="Password:")
-    # data_label.pack()
-    # data_label = tkinter.Entry(data_window, show="*")
-    # data_label.pack()
-
     # Create a frame for buttons
     button_frame = tkinter.Frame(data_window)
     button_frame.pack()
 
     # Add a "Login" button at the bottom
-    yes_button = tkinter.Button(button_frame, text="Yes", command=open_prediction_window(1))
+    yes_button = tkinter.Button(button_frame, text="Yes")#, command=open_prediction_window(1))
     yes_button.pack()
 
-    no_button = tkinter.Button(button_frame, text="No", command=open_prediction_window(2))
+    no_button = tkinter.Button(button_frame, text="No")#, command=open_prediction_window(2))
     no_button.pack()
 
     info_label = tkinter.Label(data_window, text="If no, an example dataset will be used,\n if yes, \na dataset my be formatted similar \nto the dataset linked below:")
