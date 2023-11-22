@@ -1,3 +1,4 @@
+import json
 from statistics import LinearRegression
 import tkinter
 from tkintermapview import TkinterMapView
@@ -126,6 +127,7 @@ def open_login_window():
         global_reports_button.pack_forget()
         prediction_button.pack_forget()
         data_button_pack.pack_forget()
+        map_widget.delete_all_marker()
 
         # Display the login button
         login_button_map.pack()
@@ -210,7 +212,7 @@ def save_data(username):
     data = [entry.get() for entry in report_window.winfo_children() if isinstance(entry, tkinter.Entry)]
 
     # Open a file with the username as the name
-    with open(f"{username}.txt", "a") as file:
+    with open(f"USER_{username}.txt", "a") as file:
         # Write the data to the file, separated by commas
         file.write(",".join(data) + "\n" + str(current_location) + "\n")
     report_window.destroy()
@@ -261,9 +263,30 @@ current_location = g.latlng
 
 # Set the map to the current location
 def your_reports():
-    if current_location:
-        map_widget.set_address(f"{current_location[0]}, {current_location[1]}", marker=True)
+    # Construct the file name based on the given username
+    file_name = f"USER_{username}.txt"
+    map_widget.delete_all_marker()
+    try:
+        with open(file_name, 'r') as file:
+            lines = file.readlines()
 
+            # Process the remaining lines (e.g., read and pin coordinates on the map)
+            for index in range(1, len(lines), 2):
+                coordinates_str = lines[index].strip()
+                try:
+                    # Parse the coordinates from the string
+                    coordinates = eval(coordinates_str)
+
+                    # Pin the coordinates on the map
+                    map_widget.set_address(f"{coordinates[0]}, {coordinates[1]}", marker=True, text="Your Report")
+
+                except (ValueError, IndexError) as e:
+                    print(f"Error parsing coordinates in line {index + 1}: {e}")
+
+    except FileNotFoundError:
+        map_widget.delete_all_marker()
+        print(f"File {file_name} not found.")
+    
 # Create a blank space at the bottom
 blank_space = tkinter.Frame(root_tk, height=20, bg="white")
 blank_space.pack(fill="both", expand=True, side="bottom")
