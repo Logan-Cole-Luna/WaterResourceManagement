@@ -100,6 +100,7 @@ def open_prediction_window(User_Input):
 def open_login_window():
     # Function to open a new window with the prediction image
     def print_credentials():
+        global username
         username = username_entry.get()
         password = password_entry.get()
         print("Username:", username)
@@ -113,6 +114,7 @@ def open_login_window():
         user_reports_button.pack(side="left")
         global_reports_button.pack(side="left")
         data_button_pack.pack(side="left")
+        return username
 
 
     # Function to open a new window with the prediction images
@@ -128,16 +130,13 @@ def open_login_window():
         # Display the login button
         login_button_map.pack()
 
-
-
     report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
     data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
     prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
     logout_button = tkinter.Button(blank_space, text="Log Out", command=log_out)
-    
     user_reports_button = tkinter.Button(blank_space_top, text="Your Reports", command=your_reports)
-    
     global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=open_report_window)
+
 
     login_window = tkinter.Toplevel(root_tk)
     login_window.title("Login Window")
@@ -164,9 +163,58 @@ def open_login_window():
     login_button.pack()
 
 def open_report_window():
+    global report_window
     report_window = tkinter.Toplevel(root_tk)
     report_window.title("Water Report")
-    report_window.geometry("500x500")
+    report_window.geometry("275x750")
+
+    # Create labels and entries for each parameter
+    parameters = [
+        ("Temperature:", "temp"),
+        ("pH:", "ph"),
+        ("Dissolved Oxygen:", "do"),
+        ("Rainfall:", "rainfall"),
+        ("TDS:", "tds"),
+        ("Chlorine Added:", "chlorine"),
+        ("Turbidity:", "turbidity"),
+        ("Algae Concentration:", "algae"),
+        ("Nitrate:", "nitrate"),
+        ("Phosphorus:", "phosphorus"),
+        ("Microbial Counts:", "microbial"),
+        ("BOD:", "bod"),
+        ("Heavy Metals Index:", "heavy"),
+        ("Hardness:", "hardness"),
+        ("Solids:", "solids"),
+        ("Chloramines:", "chloramines"),
+        ("Sulfate:", "sulfate"),
+        ("Conductivity:", "conductivity"),
+        ("Organic Carbon:", "organic"),
+        ("Trihalomethanes:", "trihalomethanes"),
+        ("Potability:", "potability"),
+        ("Algae Increase:", "algae_increase")
+    ]
+
+    for i, (label_text, entry_name) in enumerate(parameters):
+        label = tkinter.Label(report_window, text=label_text)
+        label.grid(row=i, column=0, padx=5, pady=5)
+
+        entry = tkinter.Entry(report_window)
+        entry.grid(row=i, column=1, padx=5, pady=5)
+
+    # Create a submit button that saves the data to a file
+    submit_button = tkinter.Button(report_window, text="Submit", command=lambda: save_data(username))
+    submit_button.grid(row=len(parameters), column=0, columnspan=2, padx=5, pady=5)
+
+def save_data(username):
+    # Get the values from the entries
+    data = [entry.get() for entry in report_window.winfo_children() if isinstance(entry, tkinter.Entry)]
+
+    # Open a file with the username as the name
+    with open(f"{username}.txt", "a") as file:
+        # Write the data to the file, separated by commas
+        file.write(",".join(data) + "\n" + str(current_location) + "\n")
+    report_window.destroy()
+
 
 def open_data_window():
     data_window = tkinter.Toplevel(root_tk)
