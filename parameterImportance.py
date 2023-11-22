@@ -5,12 +5,13 @@ from sklearn.ensemble import RandomForestClassifier
 
 # Load logan's dataset
 data = pd.read_csv("water_potability.csv")
+print("Reading?")
+data['Solids'] = data['Solids'] / 100
+
 
 # take out all null rows, could be changed later but this seems the most accurate
 data_clean = data.dropna()
-
-#check for pH levels outside of 6.5 and 7.5
-condition = (data['ph']<6.5)|(data['ph']>8.5)
+#convert tds to right units
 
 
 
@@ -41,4 +42,4 @@ pyplot.show()
 
 
 #final csv
-data_clean.to_csv('cleaned_data.csv',index=False)
+data_clean.to_csv('clean_data.csv',index=False)
