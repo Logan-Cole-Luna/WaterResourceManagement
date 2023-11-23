@@ -137,7 +137,7 @@ def open_login_window():
     prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
     logout_button = tkinter.Button(blank_space, text="Log Out", command=log_out)
     user_reports_button = tkinter.Button(blank_space_top, text="Your Reports", command=your_reports)
-    global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=open_report_window)
+    global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=global_reports)
 
 
     login_window = tkinter.Toplevel(root_tk)
@@ -215,6 +215,9 @@ def save_data(username):
     with open(f"USER_{username}.txt", "a") as file:
         # Write the data to the file, separated by commas
         file.write(",".join(data) + "\n" + str(current_location) + "\n")
+    with open(f"global_reports.txt", "a") as file:
+        # Write the data to the file, separated by commas
+        file.write(",".join(data) + "\n" + str(current_location) + "\n")
     report_window.destroy()
 
 
@@ -286,6 +289,32 @@ def your_reports():
     except FileNotFoundError:
         map_widget.delete_all_marker()
         print(f"File {file_name} not found.")
+
+def global_reports():
+    # Construct the file name based on the given username
+    file_name = f"global_reports.txt"
+    map_widget.delete_all_marker()
+    try:
+        with open(file_name, 'r') as file:
+            lines = file.readlines()
+
+            # Process the remaining lines (e.g., read and pin coordinates on the map)
+            for index in range(1, len(lines), 2):
+                coordinates_str = lines[index].strip()
+                try:
+                    # Parse the coordinates from the string
+                    coordinates = eval(coordinates_str)
+
+                    # Pin the coordinates on the map
+                    map_widget.set_address(f"{coordinates[0]}, {coordinates[1]}", marker=True, text="")
+
+                except (ValueError, IndexError) as e:
+                    print(f"Error parsing coordinates in line {index + 1}: {e}")
+
+    except FileNotFoundError:
+        map_widget.delete_all_marker()
+        print(f"File {file_name} not found.")
+    
     
 # Create a blank space at the bottom
 blank_space = tkinter.Frame(root_tk, height=20, bg="white")
