@@ -5,9 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 # Load logan's dataset
 data = pd.read_csv("water_potability.csv")
-print("Reading?")
 data['Solids'] = data['Solids'] / 100
-
 
 # take out all null rows, could be changed later but this seems the most accurate
 data_clean = data.dropna()
