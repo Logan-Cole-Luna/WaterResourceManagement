@@ -8,7 +8,6 @@ from PIL import Image, ImageTk
 import pandas as pd
 from PredictionModel import train
 
-
 # Assume that the train function returns a list of image file paths
 def train():
     import matplotlib.pyplot as plt
@@ -168,23 +167,11 @@ def open_report_window():
     global report_window
     report_window = tkinter.Toplevel(root_tk)
     report_window.title("Water Report")
-    report_window.geometry("275x750")
+    report_window.geometry("275x320")
 
     # Create labels and entries for each parameter
     parameters = [
-        ("Temperature:", "temp"),
         ("pH:", "ph"),
-        ("Dissolved Oxygen:", "do"),
-        ("Rainfall:", "rainfall"),
-        ("TDS:", "tds"),
-        ("Chlorine Added:", "chlorine"),
-        ("Turbidity:", "turbidity"),
-        ("Algae Concentration:", "algae"),
-        ("Nitrate:", "nitrate"),
-        ("Phosphorus:", "phosphorus"),
-        ("Microbial Counts:", "microbial"),
-        ("BOD:", "bod"),
-        ("Heavy Metals Index:", "heavy"),
         ("Hardness:", "hardness"),
         ("Solids:", "solids"),
         ("Chloramines:", "chloramines"),
@@ -192,8 +179,7 @@ def open_report_window():
         ("Conductivity:", "conductivity"),
         ("Organic Carbon:", "organic"),
         ("Trihalomethanes:", "trihalomethanes"),
-        ("Potability:", "potability"),
-        ("Algae Increase:", "algae_increase")
+        ("Turbidity:", "turbidity"),
     ]
 
     for i, (label_text, entry_name) in enumerate(parameters):
@@ -207,8 +193,54 @@ def open_report_window():
     submit_button = tkinter.Button(report_window, text="Submit", command=lambda: save_data(username))
     submit_button.grid(row=len(parameters), column=0, columnspan=2, padx=5, pady=5)
 
+def diagnosis():
+    perfectPara = [7, 1, 1, 4, 250, 400, 25, 1, 0.1]
+    maxPara = [6.5, 500, 500, 100, 10000, 1000, 100, 100, 5]
+    
+    inputs = [float(value) for value in data]
+    respct = 0
+
+    for i in range(len(perfectPara)):
+    # If i is on pH
+        if i == 0:
+            respct += 100 - (((inputs[i] - perfectPara[i])) / perfectPara[i]) * 100
+        else:
+            # If input is between ideal and max limit. Finds percent to be subtracted
+            if perfectPara[i] < inputs[i] < maxPara[i]:
+                respct += 100 - ((inputs[i] / (maxPara[i] - perfectPara[i]) * 100))
+            # If input better than ideal. Considering still ideal
+            elif inputs[i] < perfectPara[i] and i != 0:
+                respct += 100
+            # If input worse than max limit. Auto 0
+            elif inputs[i] > maxPara[i]:
+                respct += 0
+
+    # Calculate the final adjusted percentage
+    respct /= len(perfectPara)
+        
+    if respct < 68:
+        result_text = "We recommend you do not drink this water. Below are recommendations based on your entries:\n\n"
+    elif 68 <= respct < 72:
+        result_text = "Based on your entries, this water is on the verge of being unsafe for drinking. Use caution. Below are recommendations to ensure it is drinkable:\n\n"
+    elif 72 <= respct < 85:
+        result_text = "This water is safe for drinking. To improve quality, consider the steps below:\n\n"
+    elif 85 <= respct < 100:
+        result_text = "This water is very safe to drink! Enjoy!"
+    else:
+        result_text = "Error in grading scale"
+
+    # Create a new Tkinter window
+    window = tkinter.Tk()
+    window.title("Water Quality Diagnosis")
+
+    # Create a text widget to display the results
+    result_label = tkinter.Label(window, text=result_text, wraplength=400, justify="left")
+    result_label.pack(padx=10, pady=10)
+
+    
 def save_data(username):
     # Get the values from the entries
+    global data
     data = [entry.get() for entry in report_window.winfo_children() if isinstance(entry, tkinter.Entry)]
 
     # Open a file with the username as the name
@@ -219,6 +251,7 @@ def save_data(username):
         # Write the data to the file, separated by commas
         file.write(",".join(data) + "\n" + str(current_location) + "\n")
     report_window.destroy()
+    diagnosis()
 
 
 def open_data_window():
