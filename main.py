@@ -255,8 +255,15 @@ def diagnosis():
         text_box.insert(tkinter.END, "Type Here")
         text_box.pack(pady=10)
 
+        def submit():
+            message = text_box.get("1.0", tkinter.END).strip()
+            with open(f"chat_submissions.txt", "a") as file:
+                # Write the data to the file, separated by commas
+                file.write(",".join(data) + "\n" + message + "\n" + str(current_location) + "\n")
+                contact_window.destroy()
+
         # Submit button
-        submit_button = tkinter.Button(contact_window, text="Submit", command=contact_window.destroy)
+        submit_button = tkinter.Button(contact_window, text="Submit", command=submit)
         submit_button.pack(side=tkinter.LEFT, padx=10)
 
         # Cancel button
