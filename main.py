@@ -1,6 +1,6 @@
 import json
 from statistics import LinearRegression
-import tkinter
+import tkinter 
 from tkintermapview import TkinterMapView
 import geocoder
 from tkinter import Toplevel, Label, Button
@@ -219,13 +219,13 @@ def diagnosis():
     respct /= len(perfectPara)
         
     if respct < 68:
-        result_text = "We recommend you do not drink this water. Below are recommendations based on your entries:\n\n"
+        result_text = "We recommend you do not drink this water. Click 'Report' below to report your findings to local water companies and agencies\n\n"
     elif 68 <= respct < 72:
-        result_text = "Based on your entries, this water is on the verge of being unsafe for drinking. Use caution. Below are recommendations to ensure it is drinkable:\n\n"
+        result_text = "Based on your entries, this water is on the verge of being unsafe for drinking. Use caution. Click 'Report' below to report your findings to local water companies and agencies\n\n"
     elif 72 <= respct < 85:
-        result_text = "This water is safe for drinking. To improve quality, consider the steps below:\n\n"
+        result_text = "This water is safe for drinking. To improve quality, Click 'Report' below to report your findings to local water companies and agencies\n\n"
     elif 85 <= respct < 100:
-        result_text = "This water is very safe to drink! Enjoy!"
+        result_text = "This water is very safe to drink! Click 'Report' below to report your findings to local water companies and agencies"
     else:
         result_text = "Error in grading scale"
 
@@ -236,6 +236,39 @@ def diagnosis():
     # Create a text widget to display the results
     result_label = tkinter.Label(window, text=result_text, wraplength=400, justify="left")
     result_label.pack(padx=10, pady=10)
+    close_button = tkinter.Button(window, text="Close", command=window.destroy)
+    close_button.pack()
+    def contact():
+        # Destroy any existing windows
+        window.destroy()
+
+        # Create the new contact window
+        contact_window = tkinter.Tk()
+        contact_window.title("Contact")
+
+        # Label at the top
+        label = tkinter.Label(contact_window, text="Address concerns to local water quality companies and agencies")
+        label.pack(pady=10)
+
+        # Text box for multiline input
+        text_box = tkinter.Text(contact_window, height=5, width=40)
+        text_box.insert(tkinter.END, "Type Here")
+        text_box.pack(pady=10)
+
+        # Submit button
+        submit_button = tkinter.Button(contact_window, text="Submit", command=contact_window.destroy)
+        submit_button.pack(side=tkinter.LEFT, padx=10)
+
+        # Cancel button
+        cancel_button = tkinter.Button(contact_window, text="Cancel", command=contact_window.destroy)
+        cancel_button.pack(side=tkinter.RIGHT, padx=10)
+
+        # Run the Tkinter event loop
+        contact_window.mainloop()
+
+    contact_button = tkinter.Button(window, text="Contact Comapnies and Agencies", command=contact)
+    contact_button.pack()
+    
 
     
 def save_data(username):
