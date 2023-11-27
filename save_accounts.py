@@ -9,8 +9,18 @@ def addAccount(Username, Password, Account):
     accounts=pd.concat([accounts,new_account],ignore_index=True)
     accounts.to_csv('accounts.csv', index=False)
 
+def checkAccount(Username, Password, accounts):
+    #checking user and password
+    rightUser = Username in accounts['Username'].values
+    if rightUser:
+        rightPassword = accounts.loc[accounts['Username']==Username,'Password'].values[0]
+        return Password == rightPassword
+    else: 
+        return False
+
+
 
 addAccount('nnnnn','dfadfa','user')
-
+print(checkAccount('Bob','dafd',accounts))
 
 
