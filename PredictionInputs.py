@@ -45,7 +45,8 @@ def open_prediction_window(User_Input):
 
     if User_Input == 1:
         # Add a button to the main window to open the upload dialog
-        upload_csv_button = tkinter.Button(root_tk, text="Upload and Display CSV", command=upload_and_display_csv(prediction_window))
+        upload_csv_button = tkinter.Button(root_tk, text="Upload and Display CSV",
+                                           command=lambda: upload_and_display_csv(prediction_window))
         upload_csv_button.pack()
 
     elif User_Input == 2:
