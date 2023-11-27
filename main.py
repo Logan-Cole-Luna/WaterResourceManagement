@@ -1,24 +1,22 @@
 import json
-#from statistics import LinearRegression
-#from PredictionModel import train
-#from PredictionInputs import upload_and_display_csv, open_prediction_window, display_csv, open_data_window
-import tkinter
+from statistics import LinearRegression
+import tkinter 
 from tkintermapview import TkinterMapView
 import geocoder
 from tkinter import Toplevel, Label, Button
 from PIL import Image, ImageTk
-from PredictionModel import train
-from tkinter import ttk
-from tkinter import filedialog
 import pandas as pd
-import shutil
-import os
-from sklearn.linear_model import LinearRegression
-
+from PredictionModel import train
 
 # Assume that the train function returns a list of image file paths
-def train(dataset):
+def train():
     import matplotlib.pyplot as plt
+    # Load the dataset based off of user input
+    # if input == 1
+    # dataset = input
+    # if input == 2
+    dataset = pd.read_csv('water_potability_augmented_v2.csv')
+
     # Sort dataset by Date
     dataset = dataset.sort_values(by='Date')
 
@@ -73,23 +71,22 @@ def train(dataset):
     # Return the path of the saved images
     return 'predicted_algae_concentration.png'
 
-def upload_and_display_csv(prediction_window):
-    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+def open_prediction_window(User_Input):
+    # Function to open a new window with the prediction image
 
-    if not file_path:  # User has cancelled the file open dialog
-        return
+    data_window = Toplevel(root_tk)
+    data_window.title("Data Input Window")
+    data_window.geometry("300x200")
+    prediction_window.title("Prediction Results")
+    prediction_window = Toplevel(data_window)
 
-    # Define the new name for the CSV file
-    new_name = "uploaded_file.csv"
-    # Get the directory where the script is running
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    new_path = os.path.join(script_dir, new_name)
-
-    # Copy the file to the new location with the new name
-    shutil.copy(file_path, new_path)
+    if User_Input == 1:
+        dataset = 1
+    elif User_Input == 2:
+        dataset = pd.read_csv('water_potability_augmented_v2.csv')
 
     # Load and display the prediction image
-    image_path = train(new_path)
+    image_path = train(dataset)
     img = Image.open(image_path)
     img = img.resize((400, 250), Image.ANTIALIAS)
     img = ImageTk.PhotoImage(img)
@@ -97,68 +94,7 @@ def upload_and_display_csv(prediction_window):
     panel.image = img
     panel.pack()
 
-
-# Assume that the train function returns a list of image file paths
-def open_prediction_window(User_Input):
-    data_window = Toplevel(root_tk)
-    data_window.geometry("300x200")
-    prediction_window = Toplevel(data_window)
-    prediction_window.title("Prediction Results")
-
-    if User_Input == 1:
-        # Add a button to the main window to open the upload dialog
-        upload_csv_button = tkinter.Button(root_tk, text="Upload and Display CSV",
-                                           command=lambda: upload_and_display_csv(prediction_window))
-        upload_csv_button.pack()
-
-    elif User_Input == 2:
-        dataset = pd.read_csv('water_potability_augmented_v2.csv')
-        # Load and display the prediction image
-        image_path = train(dataset)
-        img = Image.open(image_path)
-        img = img.resize((400, 250), Image.ANTIALIAS)
-        #img = ImageTk.PhotoImage(img)
-        #panel = Label(prediction_window, image=img)
-        #panel.image = img
-        #panel.pack()
-        global img_reference
-        img_reference = ImageTk.PhotoImage(img)
-
-        panel = Label(prediction_window, image=img_reference)
-        panel.pack()
-
-
-def display_csv():
-    # Create a new Toplevel window
-    csv_window = tkinter.Toplevel(root_tk)
-    csv_window.title("CSV Display")
-    csv_window.geometry("600x400")
-
-    # Read the CSV file using pandas
-    df = pd.read_csv('water_potability_augmented_v2.csv')
-
-    # Create a Treeview widget
-    tree = ttk.Treeview(csv_window)
-
-    # Define our columns
-    tree['columns'] = list(df.columns)
-
-    # Format our columns
-    for column in tree['columns']:
-        tree.column(column, anchor=tkinter.W, width=120)
-        tree.heading(column, text=column, anchor=tkinter.W)
-
-    # Add data to the treeview
-    for index, row in df.iterrows():
-        tree.insert("", tkinter.END, values=list(row))
-
-    # Pack the treeview finally
-    tree.pack(expand=True, fill='both')
-
-    # Add a scrollbar
-    scrollbar = ttk.Scrollbar(csv_window, orient='vertical', command=tree.yview)
-    tree.configure(yscroll=scrollbar.set)
-    scrollbar.pack(side='right', fill='y')
+    # Button to open the prediction window
 
 
 def open_login_window():
@@ -174,6 +110,7 @@ def open_login_window():
         logout_button.pack(side="right")
         report_button.pack(side="left")
         data_button_pack.pack(side="left")
+        prediction_button.pack(side="left")
         user_reports_button.pack(side="left")
         global_reports_button.pack(side="left")
         data_button_pack.pack(side="left")
@@ -187,6 +124,7 @@ def open_login_window():
         logout_button.pack_forget()
         user_reports_button.pack_forget()
         global_reports_button.pack_forget()
+        prediction_button.pack_forget()
         data_button_pack.pack_forget()
         map_widget.delete_all_marker()
 
@@ -195,6 +133,7 @@ def open_login_window():
 
     report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
     data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
+    prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
     logout_button = tkinter.Button(blank_space, text="Log Out", command=log_out)
     user_reports_button = tkinter.Button(blank_space_top, text="Your Reports", command=your_reports)
     global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=global_reports)
@@ -278,17 +217,115 @@ def diagnosis():
 
     # Calculate the final adjusted percentage
     respct /= len(perfectPara)
+    result_text = ""
         
     if respct < 68:
-        result_text = "We recommend you do not drink this water. Click 'Report' below to report your findings to local water companies and agencies\n\n"
+        result_text += "We recommend you do not drink this water. Click 'Report' below to report your findings to local water companies and agencies\n\n"
     elif 68 <= respct < 72:
-        result_text = "Based on your entries, this water is on the verge of being unsafe for drinking. Use caution. Click 'Report' below to report your findings to local water companies and agencies\n\n"
+        result_text += "Based on your entries, this water is on the verge of being unsafe for drinking. Use caution. Click 'Report' below to report your findings to local water companies and agencies\n\n"
     elif 72 <= respct < 85:
-        result_text = "This water is safe for drinking. To improve quality, Click 'Report' below to report your findings to local water companies and agencies\n\n"
+        result_text += "This water is safe for drinking. To improve quality, Click 'Report' below to report your findings to local water companies and agencies\n\n"
     elif 85 <= respct < 100:
-        result_text = "This water is very safe to drink! Click 'Report' below to report your findings to local water companies and agencies"
+        result_text += "This water is very safe to drink! Click 'Report' below to report your findings to local water companies and agencies\n\n"
     else:
-        result_text = "Error in grading scale"
+        result_text += "Error in grading scale\n\n"
+
+    #ph
+    if inputs[0] < 6.5:
+        result_text +="You have low ph water which is more acidic than normal drinking water and can corrode a number of metallic materials.\n"
+        result_text +="This can bring unwanted metals in your water system and cause neorvous and organ damage to people who drink low ph water.\n"
+        result_text +="Sources can be from mine waste, acide generating soil and rock, industrial discharge, increase ammonium, and draining of wetlands or flood plains.\n"
+        result_text +="To fix low ph water systems you will need something to raise to raise the ph level or such as neutralizing filters containing calcite or other mateirals.\n"
+        result_text +="Contact your local water company and ask what solutions might be the right fit for your water needs.\n\n"
+    elif inputs[0] > 8.5:
+        result_text +="You have high ph water which is more alkaine than normal dirnking water which is not necessaruly dangerous above 8.5 but can cause some effects above ph levels 11.\n"
+        result_text +="High ph can build up calcium and magnusim carbonate in your pipes. High ph don't have any studies for harming other than skin problems.\n"
+        result_text +="Sources can be from industrail discharges, agricultrial runoff or manufacturing that use lye, lime, sodium hydroxide, or solvents.\n"
+        result_text +="To fix high ph  water systems you will have to install a water filter or an acid injection system to lower the water ph.\n"
+        result_text +="Contact your local water company and ask what solutions might be the right fit for your water needs.\n\n"
+    else:
+        result_text +="ph is in range of EPA freshwater standard.\n\n"
+
+    #hardness
+    if inputs[1] <= 100:
+        result_text +="Your water is soft to moderately hard which no health related effectes but have a greater tendency to cause corrosion of pipes which can lead to the presence of certain heavy metals.\n"
+        result_text +="There might be potential problem with your pipes and best to see if your pipes are non-corrosive and talk to a lcoal plumbing comapny if not.\n\n"
+    elif inputs[1] > 100 and inputs[1] <= 120:
+        result_text +="Your water hardness is moderately hard but no harmful effects have been attributed to hardness at this range.\n\n"
+    elif inputs[1] > 120 and inputs[1] <= 180:
+        result_text +="Your water hardness is hard but no harmful effects have been attributed to hardness at this range.\n\n"
+    elif inputs[1] > 180 and inputs[1] <= 200:
+        result_text +="Your water hardness is very hard but no harmful effects have been attributed to hardness at this range.\n\n"
+    elif inputs[1] > 200:
+        result_text +="Your water hardness is very hard and the hardness of water can lead to calicum magesium and mineral build up in the pipes.\n"
+        result_text +="A solution is purchase a water softner to remove calcium, magnesium, and other minerals in your water."
+        result_text +="Talk to your water company for options to your problem.\n\n"
+
+    #Solids
+    if inputs[2] <= 500:
+        result_text +="Your water is in the desirable range of drinkable water and no changes to water recommended.\n\n"
+    elif inputs[2] > 500 and inputs[2] <= 1000:
+        result_text +="Your water is in the acceptable range of drinkable water but perfer to lower the TDS of your water.\n"
+        result_text +="It's best to consider a filtration system and talk to a water company if there is concern for your water source.\n\n"
+    elif inputs[2] > 1000 and inputs[2] <= 2000:
+        result_text +="Your water is not in the acceptable range of drinkable water and it necessary to have a filter to drink the water.\n"
+        result_text +="Talk to your water company for options of a filtration system as soon as possible.\n\n"
+    else:
+        result_text +="Your water is no longer in the rage for filters to properly filter water. Contact local authorities to notify the situation.\n\n"
+
+    #Chloramines
+    if inputs[3] <= 4:
+        result_text +="Your water have safe levels of chloramines and no changes is need.\n\n"
+    else:
+        result_text +="Your water is not in safe levels of chloramines which can cause bodily harm in the form of irritation to eyes and nose and cause respiratory problems.\n"
+        result_text +="A standard carbon water filter won't remove the chloramines and a reverse osmosis or a catalyic carbon filter is required to remove chloramines.\n"
+        result_text +="Talk to your water company for options to your problem.\n\n"
+
+    #Sulfate
+    if inputs[4] <= 250:
+        result_text +="Your water is in the safe range of sulfate and no changes is needed.\n\n"
+    else:
+        result_text +="Your water past the safe range of sulfate concentration which is harmful to health and piping.\n"
+        result_text +="Health risk include diarrhea and dehydration. High concentration of sulfate is highly corrosive to copper piping.\n"
+        result_text +="Sulfate naturally occur as water travels through soil and rock containing sulfate and can naturally lead to high levels of sulfate in water.\n"
+        result_text +="Some ways to fix sulfate is to use reverse osmosis, distillation, anion exchange, and adsorptive media filtration.\n"
+        result_text +="Talk to your water company for options to your problem.\n\n"
+
+    #Conductivity
+    if inputs[5] <= 400:
+        result_text +="Your water is in the range of conductivity for drinking water and no changes is needed.\n\n"
+    else:
+        result_text +="Your water is beyond the range of conductivity for drinking water standards and can cause water to be very hard or/and be high alkalinity.\n"
+        result_text +="Some ways to fix high conductivity are distillation, reverse osmosis, ion exchange, electrodialysis, and dilution.\n"
+        result_text +="Talk to your water company for options to your problem.\n\n"
+
+    #Organic Carbon
+    if inputs[6] <= 2:
+        result_text +="Your water is in the range of total organic carbon for treated water and require no changes.\n\n"
+    elif inputs[6] <= 4:
+        result_text +="Your water is in the rnage of total organic carbon for source water but if is treated water changes is needed for safe levels.\n"
+        result_text +="You might have problems with your water treatmenet and need contact with your water company for options for your needs.\n\n"
+    else:
+        result_text +="Your water is out of range for total organic carbon for both treated and source water and can cause DBP.\n"
+        result_text +="Which can cause health problem such as bladder cancer and reproductive issues for human beings.\n"
+        result_text +="Solutions to total organic carbon are cogulation/flocculation, activated carbon, activated oxidation, ion exchange, reverse osmosis and nanofiltration.\n"
+        result_text +="Talk to your water company for options to your problem.\n\n"
+
+    #Trihalomethanes
+    if inputs[7] <= 80:
+        result_text +="Your water is in safe range of concentration of Trihalomethanes in drinking water.\n"
+    else:
+        result_text +="Your water is not in safe levels for drinking water and can cause a multitiude of cancers.\n"
+        result_text +="Solutions to high levels of trihalomethanes are enchanced cogulation, carbon filters, reverse osmosis, and if the former do not aply boiling water can lower trihalomethanes.\n"
+        result_text +="Talk to your water company for options to your problem.\n\n"
+
+    #Turbidity
+    if inputs[8] <= 5:
+        result_text +="Your water turbidity levels are in safe range for drinking water and no changes needed.\n"
+    else:
+        result_text +="Your water turbidity levels are not in safe range for drinking water and high tubidity in drinking water incidenticate disease causeing organisms.\n"
+        result_text +="Solution to turbidity are coagulation-flocculation, settling and decanting, backwashing filter, reverse osmosis filtration, and ultrafiltration.\n"
+        result_text +="Talk to your water company for options to your problem.\n\n"
 
     # Create a new Tkinter window
     window = tkinter.Tk()
@@ -336,9 +373,8 @@ def diagnosis():
 
     contact_button = tkinter.Button(window, text="Contact Comapnies and Agencies", command=contact)
     contact_button.pack()
-    
 
-    
+
 def save_data(username):
     # Get the values from the entries
     global data
@@ -364,28 +400,23 @@ def open_data_window():
     answer_label = tkinter.Label(data_window, text="Would you like to give a Dataset\n for Predictive Analysis (Yes/No):")
     answer_label.pack()
 
-    # Add password label and entry
-    # data_label = tkinter.Label(data_window, text="Password:")
-    # data_label.pack()
-    # data_label = tkinter.Entry(data_window, show="*")
-    # data_label.pack()
-
     # Create a frame for buttons
     button_frame = tkinter.Frame(data_window)
     button_frame.pack()
 
-    yes_button = tkinter.Button(button_frame, text="Yes", command=lambda: open_prediction_window(1))
-    yes_button.pack(side=tkinter.LEFT)
-    no_button = tkinter.Button(button_frame, text="No", command=lambda: open_prediction_window(2))
-    no_button.pack(side=tkinter.RIGHT)
+    # Add a "Login" button at the bottom
+    yes_button = tkinter.Button(button_frame, text="Yes")#, command=open_prediction_window(1))
+    yes_button.pack()
 
-    info_label = tkinter.Label(data_window, text="If no, an example dataset will be used,\n if yes, \na dataset must be formatted similar \nto the dataset linked below:")
+    no_button = tkinter.Button(button_frame, text="No")#, command=open_prediction_window(2))
+    no_button.pack()
+
+    info_label = tkinter.Label(data_window, text="If no, an example dataset will be used,\n if yes, \na dataset my be formatted similar \nto the dataset linked below:")
     info_label.pack()
     button_frame_low = tkinter.Frame(data_window)
     button_frame_low.pack()
-    link_button = tkinter.Button(button_frame_low, text="Example Dataset", command=display_csv)
+    link_button = tkinter.Button(button_frame_low, text="Example Dataset") #, command=print_credentials))
     link_button.pack()
-
 
 
 root_tk = tkinter.Tk()
@@ -466,5 +497,25 @@ blank_space_top.pack(fill="both", expand=True, side="top")
 # Add a "Login" button to the blank space
 login_button_map = tkinter.Button(blank_space, text="Login", command=open_login_window)
 login_button_map.pack()
+
+# Sample code to display an image, will take images from PredictionModel & display
+'''
+from PIL import ImageTk, Image
+image1 = Image.open("<path/image_name>")
+import tkinter
+from tkinter import *
+from PIL import Image, ImageTk
+root = Tk()
+
+# Create a photo image object of the image in the path
+image1 = Image.open("<path/image_name>")
+test = ImageTk.PhotoImage(image1)
+label1 = tkinter.Label(image=test)
+label1.image = test
+
+# Position image
+label1.place(x=<x_coordinate>, y=<y_coordinate>)
+root.mainloop()
+'''
 
 root_tk.mainloop()
