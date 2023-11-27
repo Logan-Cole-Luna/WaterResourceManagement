@@ -1,22 +1,24 @@
 import json
-from statistics import LinearRegression
-import tkinter 
+#from statistics import LinearRegression
+#from PredictionModel import train
+#from PredictionInputs import upload_and_display_csv, open_prediction_window, display_csv, open_data_window
+import tkinter
 from tkintermapview import TkinterMapView
 import geocoder
 from tkinter import Toplevel, Label, Button
 from PIL import Image, ImageTk
-import pandas as pd
 from PredictionModel import train
+from tkinter import ttk
+from tkinter import filedialog
+import pandas as pd
+import shutil
+import os
+from sklearn.linear_model import LinearRegression
+
 
 # Assume that the train function returns a list of image file paths
-def train():
+def train(dataset):
     import matplotlib.pyplot as plt
-    # Load the dataset based off of user input
-    # if input == 1
-    # dataset = input
-    # if input == 2
-    dataset = pd.read_csv('water_potability_augmented_v2.csv')
-
     # Sort dataset by Date
     dataset = dataset.sort_values(by='Date')
 
@@ -71,22 +73,23 @@ def train():
     # Return the path of the saved images
     return 'predicted_algae_concentration.png'
 
-def open_prediction_window(User_Input):
-    # Function to open a new window with the prediction image
+def upload_and_display_csv(prediction_window):
+    file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
 
-    data_window = Toplevel(root_tk)
-    data_window.title("Data Input Window")
-    data_window.geometry("300x200")
-    prediction_window.title("Prediction Results")
-    prediction_window = Toplevel(data_window)
+    if not file_path:  # User has cancelled the file open dialog
+        return
 
-    if User_Input == 1:
-        dataset = 1
-    elif User_Input == 2:
-        dataset = pd.read_csv('water_potability_augmented_v2.csv')
+    # Define the new name for the CSV file
+    new_name = "uploaded_file.csv"
+    # Get the directory where the script is running
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    new_path = os.path.join(script_dir, new_name)
+
+    # Copy the file to the new location with the new name
+    shutil.copy(file_path, new_path)
 
     # Load and display the prediction image
-    image_path = train(dataset)
+    image_path = train(new_path)
     img = Image.open(image_path)
     img = img.resize((400, 250), Image.ANTIALIAS)
     img = ImageTk.PhotoImage(img)
@@ -94,7 +97,68 @@ def open_prediction_window(User_Input):
     panel.image = img
     panel.pack()
 
-    # Button to open the prediction window
+
+# Assume that the train function returns a list of image file paths
+def open_prediction_window(User_Input):
+    data_window = Toplevel(root_tk)
+    data_window.geometry("300x200")
+    prediction_window = Toplevel(data_window)
+    prediction_window.title("Prediction Results")
+
+    if User_Input == 1:
+        # Add a button to the main window to open the upload dialog
+        upload_csv_button = tkinter.Button(root_tk, text="Upload and Display CSV",
+                                           command=lambda: upload_and_display_csv(prediction_window))
+        upload_csv_button.pack()
+
+    elif User_Input == 2:
+        dataset = pd.read_csv('water_potability_augmented_v2.csv')
+        # Load and display the prediction image
+        image_path = train(dataset)
+        img = Image.open(image_path)
+        img = img.resize((400, 250), Image.ANTIALIAS)
+        #img = ImageTk.PhotoImage(img)
+        #panel = Label(prediction_window, image=img)
+        #panel.image = img
+        #panel.pack()
+        global img_reference
+        img_reference = ImageTk.PhotoImage(img)
+
+        panel = Label(prediction_window, image=img_reference)
+        panel.pack()
+
+
+def display_csv():
+    # Create a new Toplevel window
+    csv_window = tkinter.Toplevel(root_tk)
+    csv_window.title("CSV Display")
+    csv_window.geometry("600x400")
+
+    # Read the CSV file using pandas
+    df = pd.read_csv('water_potability_augmented_v2.csv')
+
+    # Create a Treeview widget
+    tree = ttk.Treeview(csv_window)
+
+    # Define our columns
+    tree['columns'] = list(df.columns)
+
+    # Format our columns
+    for column in tree['columns']:
+        tree.column(column, anchor=tkinter.W, width=120)
+        tree.heading(column, text=column, anchor=tkinter.W)
+
+    # Add data to the treeview
+    for index, row in df.iterrows():
+        tree.insert("", tkinter.END, values=list(row))
+
+    # Pack the treeview finally
+    tree.pack(expand=True, fill='both')
+
+    # Add a scrollbar
+    scrollbar = ttk.Scrollbar(csv_window, orient='vertical', command=tree.yview)
+    tree.configure(yscroll=scrollbar.set)
+    scrollbar.pack(side='right', fill='y')
 
 
 def open_login_window():
@@ -110,7 +174,6 @@ def open_login_window():
         logout_button.pack(side="right")
         report_button.pack(side="left")
         data_button_pack.pack(side="left")
-        prediction_button.pack(side="left")
         user_reports_button.pack(side="left")
         global_reports_button.pack(side="left")
         data_button_pack.pack(side="left")
@@ -124,7 +187,6 @@ def open_login_window():
         logout_button.pack_forget()
         user_reports_button.pack_forget()
         global_reports_button.pack_forget()
-        prediction_button.pack_forget()
         data_button_pack.pack_forget()
         map_widget.delete_all_marker()
 
@@ -133,7 +195,6 @@ def open_login_window():
 
     report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
     data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=open_data_window)
-    prediction_button = Button(blank_space, text="Show Predictive Analysis", command=open_prediction_window)
     logout_button = tkinter.Button(blank_space, text="Log Out", command=log_out)
     user_reports_button = tkinter.Button(blank_space_top, text="Your Reports", command=your_reports)
     global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=global_reports)
@@ -303,23 +364,28 @@ def open_data_window():
     answer_label = tkinter.Label(data_window, text="Would you like to give a Dataset\n for Predictive Analysis (Yes/No):")
     answer_label.pack()
 
+    # Add password label and entry
+    # data_label = tkinter.Label(data_window, text="Password:")
+    # data_label.pack()
+    # data_label = tkinter.Entry(data_window, show="*")
+    # data_label.pack()
+
     # Create a frame for buttons
     button_frame = tkinter.Frame(data_window)
     button_frame.pack()
 
-    # Add a "Login" button at the bottom
-    yes_button = tkinter.Button(button_frame, text="Yes")#, command=open_prediction_window(1))
-    yes_button.pack()
+    yes_button = tkinter.Button(button_frame, text="Yes", command=lambda: open_prediction_window(1))
+    yes_button.pack(side=tkinter.LEFT)
+    no_button = tkinter.Button(button_frame, text="No", command=lambda: open_prediction_window(2))
+    no_button.pack(side=tkinter.RIGHT)
 
-    no_button = tkinter.Button(button_frame, text="No")#, command=open_prediction_window(2))
-    no_button.pack()
-
-    info_label = tkinter.Label(data_window, text="If no, an example dataset will be used,\n if yes, \na dataset my be formatted similar \nto the dataset linked below:")
+    info_label = tkinter.Label(data_window, text="If no, an example dataset will be used,\n if yes, \na dataset must be formatted similar \nto the dataset linked below:")
     info_label.pack()
     button_frame_low = tkinter.Frame(data_window)
     button_frame_low.pack()
-    link_button = tkinter.Button(button_frame_low, text="Example Dataset") #, command=print_credentials))
+    link_button = tkinter.Button(button_frame_low, text="Example Dataset", command=display_csv)
     link_button.pack()
+
 
 
 root_tk = tkinter.Tk()
@@ -400,27 +466,5 @@ blank_space_top.pack(fill="both", expand=True, side="top")
 # Add a "Login" button to the blank space
 login_button_map = tkinter.Button(blank_space, text="Login", command=open_login_window)
 login_button_map.pack()
-
-
-
-# Sample code to display an image, will take images from PredictionModel & display
-'''
-from PIL import ImageTk, Image
-image1 = Image.open("<path/image_name>")
-import tkinter
-from tkinter import *
-from PIL import Image, ImageTk
-root = Tk()
-
-# Create a photo image object of the image in the path
-image1 = Image.open("<path/image_name>")
-test = ImageTk.PhotoImage(image1)
-label1 = tkinter.Label(image=test)
-label1.image = test
-
-# Position image
-label1.place(x=<x_coordinate>, y=<y_coordinate>)
-root.mainloop()
-'''
 
 root_tk.mainloop()
