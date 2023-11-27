@@ -5,12 +5,12 @@ from statistics import pvariance
 # also import the input data from main when that code is made
 
 #for now, use list from here, but should be from inputted values
-inputs = [7.721078493617457,208.43859260220216,172.48618742002742,7.6853697349708545,286.4035215485703,269.0136348220542,11.757348236756798,56.8845279970477,3.223951089800068]
+inputs = [2,2,2,2,2,2,2,2,4]
 
 #ph: 7,Hardness: 0,Solids: <500,Chloramines: <4,Sulfate: <250,Conductivity: <400,Organic_carbon: <25,Trihalomethanes: <80,Turbidity: <5,
 #conductivity: uS/cm , turbitity: NTU, solids: mg/L, hardness: mg/L, organiz_carbon: mg/L, Trihalomethanes: mg/L, 
 perfectPara = [7,1,1,4,250,400,25,1,0.1]
-maxPara = [6.5, 500, 500,100, 10000, 1000, 100,100,5]
+maxPara = [1, 500, 500,100, 10000, 1000, 100,100,5]
 adjPara = []
 
 #calculate value value /100 of each parameter. Uses deviation multiplied by importance found 
