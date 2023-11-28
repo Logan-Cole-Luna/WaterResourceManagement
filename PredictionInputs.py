@@ -8,6 +8,7 @@ import shutil
 import os
 from PredictionModel import train
 
+
 def upload_and_display_csv(prediction_window):
     file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
 
@@ -22,27 +23,30 @@ def upload_and_display_csv(prediction_window):
 
     # Copy the file to the new location with the new name
     shutil.copy(file_path, new_path)
+    new_path = pd.read_csv(new_path)
 
     # Load and display the prediction image
     image_path = train(new_path)
     img = Image.open(image_path)
-    img = img.resize((400, 250), Image.ANTIALIAS)
     img = ImageTk.PhotoImage(img)
     panel = Label(prediction_window, image=img)
     panel.image = img
     panel.pack()
 
+
 # Assume that the train function returns a list of image file paths
 def open_prediction_window(User_Input, root_tk):
-    prediction_window = Toplevel(root_tk)
-    prediction_window.title("Prediction Results")
-
     if User_Input == 1:
+        prediction_window = Toplevel(root_tk)
+        prediction_window.title("Upload CSV")
         # Add a button to the main window to open the upload dialog
-        upload_csv_button = tkinter.Button(root_tk, text="Upload and Display CSV",  command=lambda: upload_and_display_csv(prediction_window))
+        upload_csv_button = tkinter.Button(prediction_window, text="Upload and Display CSV",
+                                           command=lambda: upload_and_display_csv(prediction_window))
         upload_csv_button.pack()
 
     elif User_Input == 2:
+        prediction_window = Toplevel(root_tk)
+        prediction_window.title("Prediction Results")
         dataset = pd.read_csv('water_potability_augmented_v2.csv')
         # Load and display the prediction image
         image_path = train(dataset)
@@ -85,6 +89,7 @@ def display_csv(root_tk):
     tree.configure(yscroll=scrollbar.set)
     scrollbar.pack(side='right', fill='y')
 
+
 def open_data_window(root_tk):
     data_window = tkinter.Toplevel(root_tk)
     data_window.title("Data Input Window")
@@ -107,5 +112,5 @@ def open_data_window(root_tk):
     info_label.pack()
     button_frame_low = tkinter.Frame(data_window)
     button_frame_low.pack()
-    link_button = tkinter.Button(button_frame_low, text="Example Dataset", command=display_csv(root_tk))
+    link_button = tkinter.Button(button_frame_low, text="Example Dataset", command=lambda: display_csv(root_tk))
     link_button.pack()
