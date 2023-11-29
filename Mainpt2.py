@@ -33,39 +33,68 @@ def open_login_window():
         data_button_pack.pack_forget()
         map_widget.delete_all_marker()
 
-        # Display the login button
-        login_button_map.pack()
+    # Display the login button
+    login_button_map.pack()
 
-    report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
-    data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=lambda: open_data_window(root_tk))
-    logout_button = tkinter.Button(blank_space, text="Log Out", command=log_out)
-    user_reports_button = tkinter.Button(blank_space_top, text="Your Reports", command=your_reports)
-    global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=global_reports)
-
+    # Main login window configuration
     login_window = tkinter.Toplevel(root_tk)
     login_window.title("Login Window")
-    login_window.geometry("300x200")
+    login_window.state('zoomed')  # This will maximize the window
 
-    # Add username label and entry
-    username_label = tkinter.Label(login_window, text="Username:")
-    username_label.pack()
-    username_entry = tkinter.Entry(login_window)
-    username_entry.pack()
+    # Center frame for login form
+    center_frame = tkinter.Frame(login_window)
+    center_frame.grid(row=1, column=1, sticky="nsew")
 
-    # Add password label and entry
-    password_label = tkinter.Label(login_window, text="Password:")
-    password_label.pack()
-    password_entry = tkinter.Entry(login_window, show="*")
-    password_entry.pack()
+    # Configure weights for centering the frame
+    login_window.grid_rowconfigure(0, weight=1)
+    login_window.grid_rowconfigure(1, weight=0)
+    login_window.grid_rowconfigure(2, weight=1)
+    login_window.grid_columnconfigure(0, weight=1)
+    login_window.grid_columnconfigure(1, weight=0)
+    login_window.grid_columnconfigure(2, weight=1)
 
-    # Create a frame for buttons
-    button_frame = tkinter.Frame(login_window)
-    button_frame.pack()
+    # Login form setup
+    username_label = tkinter.Label(center_frame, text="Username:")
+    username_label.grid(row=0, column=0, sticky="e", padx=5, pady=5)
+    username_entry = tkinter.Entry(center_frame)
+    username_entry.grid(row=0, column=1, sticky="w", padx=5, pady=5)
 
-    # Add a "Login" button at the bottom
-    login_button = tkinter.Button(button_frame, text="Login", command=print_credentials)
-    login_button.pack()
+    password_label = tkinter.Label(center_frame, text="Password:")
+    password_label.grid(row=1, column=0, sticky="e", padx=5, pady=5)
+    password_entry = tkinter.Entry(center_frame, show="*")
+    password_entry.grid(row=1, column=1, sticky="w", padx=5, pady=5)
 
+    login_button = tkinter.Button(center_frame, text="Login", command=print_credentials)
+    login_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+    # Bottom buttons configuration
+    bottom_buttons_frame = tkinter.Frame(login_window)
+    bottom_buttons_frame.grid(row=2, column=1, sticky="ew")
+
+    report_button = tkinter.Button(bottom_buttons_frame, text="Report", command=open_report_window)
+    report_button.pack(side='left', padx=10)
+
+    data_button_pack = tkinter.Button(bottom_buttons_frame, text="Predictive Model",
+                                      command=lambda: open_data_window(root_tk))
+    data_button_pack.pack(side='left', padx=10)
+
+    logout_button = tkinter.Button(bottom_buttons_frame, text="Log Out", command=log_out)
+    logout_button.pack(side='right', padx=10)
+
+    # Top buttons configuration
+    top_buttons_frame = tkinter.Frame(login_window)
+    top_buttons_frame.grid(row=0, column=1, sticky="ew")
+
+    user_reports_button = tkinter.Button(top_buttons_frame, text="Your Reports", command=your_reports)
+    user_reports_button.pack(side='left', padx=10)
+
+    global_reports_button = tkinter.Button(top_buttons_frame, text="Global Reports", command=global_reports)
+    global_reports_button.pack(side='left', padx=10)
+
+    # Ensure the bottom and top frames fill their grid cell
+    login_window.grid_rowconfigure(0, weight=1)
+    login_window.grid_columnconfigure(1, weight=1)
+    login_window.grid_rowconfigure(2, weight=1)
 
 def open_report_window():
     global report_window
