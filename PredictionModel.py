@@ -1,8 +1,10 @@
 # https://www.kaggle.com/code/mrtoddy/kagglepredic
 # Time Series Forecasting
-import pandas as pd
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
+import pandas as pd
+import matplotlib.dates as mdates
+
 
 def train(dataset):
     # Sort dataset by Date
@@ -33,16 +35,25 @@ def train(dataset):
 
     # Plot Actual vs. Predicted - ensuring that the dates match the predictions
     plt.figure(figsize=(14, 6))
-    plt.plot(test_dataset['Date'], y_test, label='Actual Values', color='blue')
+    # plt.plot(test_dataset['Date'], y_test, label='Actual Values', color='blue')
     plt.plot(test_dataset['Date'], predictions, label='Predicted Values', color='red', linestyle='dashed')
     plt.title('Predicted Algae Concentration')
     plt.xlabel('Date')
     plt.ylabel('Algae Concentration')
+
+    # Format the date on x-axis to display every 5 years
+    plt.gca().xaxis.set_major_locator(mdates.YearLocator(1))
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+
     plt.legend()
-    # Save the Predicted Algae Concentration plot
     plt.savefig('predicted_algae_concentration.png')
     plt.show()
     plt.close()
 
     # Return the path of the saved images
     return 'predicted_algae_concentration.png'
+
+
+#dataset = pd.read_csv('water_potability_augmented_v2.csv')
+
+#train(dataset)
