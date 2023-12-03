@@ -1,8 +1,10 @@
 import tkinter
 from tkintermapview import TkinterMapView
 import geocoder
+from geopy.geocoders import Nominatim
 from tkinter import Toplevel, Label, Button
 from PredictionInputs import open_data_window
+import ast
 
 
 def open_login_window():
@@ -16,6 +18,7 @@ def open_login_window():
         login_window.destroy()
         login_button_map.pack_forget()  # Remove the login button
         logout_button.pack(side="right")
+        chats_button.pack(side="right")
         report_button.pack(side="left")
         data_button_pack.pack(side="left")
         user_reports_button.pack(side="left")
@@ -40,6 +43,7 @@ def open_login_window():
     report_button = tkinter.Button(blank_space, text="Report", command=open_report_window)
     data_button_pack = tkinter.Button(blank_space, text="Predictive Model", command=lambda: open_data_window(root_tk))
     logout_button = tkinter.Button(blank_space, text="Log Out", command=log_out)
+    chats_button = tkinter.Button(blank_space, text="Chat Logs", command=chat_log)
     user_reports_button = tkinter.Button(blank_space_top, text="Your Reports", command=your_reports)
     global_reports_button = tkinter.Button(blank_space_top, text="Global Reports", command=global_reports)
 
@@ -336,6 +340,35 @@ def your_reports():
     except FileNotFoundError:
         map_widget.delete_all_marker()
         print(f"File {file_name} not found.")
+
+def chat_log():
+    # Construct the file name based on the given username
+    file_name = f"chat_submissions.txt"
+
+    # Create the new contact window
+    chat_log_window = tkinter.Tk()
+    chat_log_window.title("Chats")
+    chat_log_window.geometry("275x320")
+
+    # Label at the top
+    label = tkinter.Label(chat_log_window, text="Report Overview")
+    label.pack(pady=10)
+
+    chats = ""
+
+    try:
+        with open(file_name, 'r') as file:
+            # Read all lines and concatenate them
+            chats = file.read()
+
+    except FileNotFoundError:
+        print(f"File {file_name} not found.")
+
+    result_label = tkinter.Label(chat_log_window, text=chats, wraplength=400, justify="left")
+    result_label.pack(padx=10, pady=10)
+    close_button = tkinter.Button(chat_log_window, text="Close", command=chat_log_window.destroy)
+    close_button.pack()
+
 
 def global_reports():
     # Construct the file name based on the given username
