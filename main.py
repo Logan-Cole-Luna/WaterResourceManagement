@@ -1,7 +1,6 @@
 import tkinter
 from tkintermapview import TkinterMapView
 import geocoder
-from geopy.geocoders import Nominatim
 from tkinter import Toplevel, Label, Button
 from PredictionInputs import open_data_window
 import ast
@@ -11,6 +10,7 @@ def open_login_window():
     # Function to open a new window with the prediction image
     def print_credentials():
         global username
+        global chats_button_add
         username = username_entry.get()
         password = password_entry.get()
         print("Username:", username)
@@ -25,6 +25,7 @@ def open_login_window():
         data_button_pack.pack(side="left")
         if chats_button_add == 1:
             chats_button.pack(side="right")
+        chats_button_add = 0
         return username
 
 
@@ -387,6 +388,7 @@ def chat_log():
 
 def global_reports():
     # Construct the file name based on the given username
+    inc = 0 
     file_name = f"global_reports.txt"
     map_widget.delete_all_marker()
     try:
@@ -401,8 +403,9 @@ def global_reports():
                     coordinates = eval(coordinates_str)
 
                     # Pin the coordinates on the map
-                    map_widget.set_address(f"{coordinates[0]}, {coordinates[1]}", marker=True, text="")
-
+                    inc += 1
+                    map_widget.set_address(f"{coordinates[0]}, {coordinates[1]}", marker=True, text=("Report " + str(inc)))
+ 
                 except (ValueError, IndexError) as e:
                     print(f"Error parsing coordinates in line {index + 1}: {e}")
 
