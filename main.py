@@ -18,12 +18,13 @@ def open_login_window():
         login_window.destroy()
         login_button_map.pack_forget()  # Remove the login button
         logout_button.pack(side="right")
-        chats_button.pack(side="right")
         report_button.pack(side="left")
         data_button_pack.pack(side="left")
         user_reports_button.pack(side="left")
         global_reports_button.pack(side="left")
         data_button_pack.pack(side="left")
+        if chats_button_add == 1:
+            chats_button.pack(side="right")
         return username
 
 
@@ -34,6 +35,7 @@ def open_login_window():
         logout_button.pack_forget()
         user_reports_button.pack_forget()
         global_reports_button.pack_forget()
+        chats_button.pack_forget()
         data_button_pack.pack_forget()
         map_widget.delete_all_marker()
 
@@ -63,6 +65,19 @@ def open_login_window():
     password_label.pack()
     password_entry = tkinter.Entry(login_window, show="*")
     password_entry.pack()
+
+    def toggle_chats():
+        global chats_button_add
+        if enterprise_checkbox_var.get() == 1:
+            chats_button_add = 1
+        else:
+            chats_button.pack_forget()
+            chats_button_add = 0
+
+
+    enterprise_checkbox_var = tkinter.IntVar()
+    enterprise_checkbox = tkinter.Checkbutton(login_window, text="Enterprise Account", variable=enterprise_checkbox_var, command=toggle_chats)
+    enterprise_checkbox.pack()
 
     # Create a frame for buttons
     button_frame = tkinter.Frame(login_window)
